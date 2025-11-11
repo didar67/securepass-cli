@@ -1,31 +1,21 @@
 """
-Entry point for the Password Tool project.
-
-Handles orchestration only — initializes logging, invokes CLI/service layers,
-and manages graceful exception handling.
+Main entry point of the Password Tool application.
+Handles startup orchestration and delegates execution to CLI.
 """
 
-from core.logger import setup_logger
+import sys
+from script import cli
 
 
 def main():
-    """
-    Main orchestration function.
-    Initializes logging and coordinates further workflow.
-    """
-    logger = setup_logger()
-
-    try:
-        logger.info("Application started successfully.")
-        # Future: CLI argument parsing and service calls will come here
-        logger.info("Executing core workflow...")
-
-    except Exception as e:
-        logger.exception(f"Unexpected error occurred: {e}")
-
-    finally:
-        logger.info("Application shutdown complete.")
+    """Main entry function — orchestrates CLI execution."""
+    cli.start_app()
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+        sys.exit(0)
+    except Exception as e:
+        print(f"FATAL ERROR: {e}")
+        sys.exit(1)
