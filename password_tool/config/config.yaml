@@ -1,0 +1,21 @@
+# Default configuration for password_tool.
+# Edit values as needed or override via environment/CLI in future steps.
+
+logging:
+  log_dir: "logs"
+  log_file: "app.log"
+  error_log_file: "error.log"
+  level: "INFO"
+  rotate_max_bytes: 5242880   # 5 MB
+  rotate_backup_count: 3
+
+password:
+  default_length: 12
+  min_length: 6
+  max_length: 64
+  storage_folder: "generated_passwords"
+  storage_file: "password_records.txt"
+
+app:
+  name: "password_tool"
+  version: "0.1.0"
