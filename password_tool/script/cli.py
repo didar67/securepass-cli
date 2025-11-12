@@ -1,19 +1,22 @@
 """
 Handles command-line interface for Password Tool.
-Uses argparse for structured, user-friendly CLI command management.
+Provides structured subcommands (generate, open) for end users.
 """
 
 import argparse
 import sys
-from utils.helpers import validate_length
+from typing import Optional
+from script.commands import cmd_generate, cmd_open_records
+from script.config_loader import Config
+from utils.helpers import ensure_dir
 
 
-def start_app():
+def start_app(config: Optional[Config] = None) -> None:
     """
-    Initializes and runs the Password Tool CLI interface.
+    Initialize and run the Password Tool CLI interface.
 
-    This function handles command parsing and triggers relevant
-    functionality (generate, open, etc.) in the main workflow.
+    Args:
+        config (Optional[Config]): Loaded configuration object (YAML-based).
     """
     parser = argparse.ArgumentParser(
         prog="password_tool",
@@ -21,13 +24,11 @@ def start_app():
         epilog="Example: python main.py generate --level personal --length 16",
     )
 
-    # Sub-commands
+    # Define subcommands
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
     # Generate command
-    generate_parser = subparsers.add_parser(
-        "generate", help="Generate a secure password"
-    )
+    generate_parser = subparsers.add_parser("generate", help="Generate a secure password")
     generate_parser.add_argument(
         "--level", "-l",
         type=str,
@@ -40,25 +41,36 @@ def start_app():
         default=12,
         help="Password length (default: 12)",
     )
+    generate_parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Preview password without saving to file",
+    )
 
     # Open command
-    subparsers.add_parser("open", help="Open the saved password file")
+    subparsers.add_parser("open", help="Open the saved password record file")
 
-    # Parse arguments
+    # Parse CLI args
     args = parser.parse_args()
 
-    # Handle actions
-    if args.command == "generate":
-        if not validate_length(args.length):
-            print("Invalid length: must be between 6 and 64")
-            sys.exit(1)
+    try:
+        if args.command == "generate":
+            from pathlib import Path
+            ensure_dir(Path("records"))  # ensures directory exists
+            pwd = cmd_generate(
+                level=args.level,
+                length=args.length,
+                config=config,
+                dry_run=args.dry_run,
+            )
+            print(f"Generated password for [{args.level}]: {pwd}")
 
-        print(f"Generating password for level: {args.level}, length: {args.length}")
-        # Placeholder: actual password generator logic will be connected later
+        elif args.command == "open":
+            cmd_open_records(config=config)
 
-    elif args.command == "open":
-        print("Opening password record file...")
-        # Placeholder for file reveal logic
+        else:
+            parser.print_help()
 
-    else:
-        parser.print_help()
+    except Exception as exc:
+        print(f"[ERROR] CLI execution failed: {exc}")
+        sys.exit(1)
