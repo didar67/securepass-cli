@@ -18,7 +18,7 @@ import os
 import sys
 import subprocess
 from pathlib import Path
-
+from core.exceptions import PasswordError, FileAccessError
 from script.config_loader import Config  # Pydantic model from Step 4
 from utils.helpers import safe_append_text, timestamp_now, ensure_dir
 
@@ -88,6 +88,21 @@ def get_password_file_path(config: Optional[Config] = None) -> Path:
 
     ensure_dir(folder)
     return folder / filename
+
+
+def save_password(level: str, password: str, file_path: str) -> None:
+    """
+    Save generated password securely to the given file path.
+    """
+    try:
+        with open(file_path, "a", encoding="utf-8") as f:
+            f.write(f"{level}: {password}\n")
+    except PermissionError as e:
+        raise FileAccessError(f"Permission denied while saving: {e}")
+    except FileNotFoundError as e:
+        raise FileAccessError(f"Directory not found: {e}")
+    except Exception as e:
+        raise PasswordError(f"Unexpected error during save: {e}")
 
 
 def save_password_record(level: str, password: str, config: Optional[Config] = None,
