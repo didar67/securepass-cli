@@ -1,0 +1,52 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+env/
+.venv/
+ENV/
+env.bak/
+
+# Logs and temp files
+*.log
+logs/
+*.tmp
+*.swp
+*.bak
+*.old
+
+# OS / IDE Specific
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
+
+# Test & Coverage
+.coverage
+htmlcov/
+.tox/
+pytest_cache/
+.cache/
+
+# Build & Distribution
+build/
+dist/
+*.egg-info/
+*.egg
+.eggs/
+
+# Configs and secrets
+config/*.yaml
+!config/config.example.yaml
+
+# Jupyter / notebooks
+*.ipynb_checkpoints
+
+# Docker & CI
+docker-compose.override.yml
+.env
